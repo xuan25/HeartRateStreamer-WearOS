@@ -6,6 +6,7 @@
 package com.xuan25.heartratestreamer.presentation
 
 import android.Manifest
+import android.app.RemoteInput
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
@@ -13,8 +14,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.view.inputmethod.EditorInfo
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -30,8 +34,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.Error
@@ -42,17 +44,13 @@ import androidx.compose.material.icons.rounded.RadioButtonChecked
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.Wifi
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -66,6 +64,8 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
+import androidx.wear.input.RemoteInputIntentHelper
+import androidx.wear.input.wearableExtender
 import com.xuan25.heartratestreamer.ConnectionStatus
 import com.xuan25.heartratestreamer.HeartRatePermissionManager
 import com.xuan25.heartratestreamer.HeartRateSender
@@ -233,6 +233,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+private const val KEY_ENDPOINT_TEXT: String = "endpoint"
+
 @Composable
 fun HeartRateScreen(
     heartRate: Double?,
@@ -306,6 +308,33 @@ fun HeartRateScreen(
     val canStart = !isMeasuringPhase && !isBusyPermissionsOrCheck
     val canStop = isMeasuringPhase
     // -------------------------------------
+
+
+    // --- endpoint input ---
+
+    val onEndpointInputLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        it.data?.let { data ->
+            val results: Bundle = RemoteInput.getResultsFromIntent(data)
+            val endpoint: CharSequence? = results.getCharSequence(KEY_ENDPOINT_TEXT)
+            onEndpointChanged(endpoint.toString())
+        }
+    }
+
+    val onEndpointInputClick = {
+        val remoteInputs: List<RemoteInput> = listOf(
+            RemoteInput.Builder(KEY_ENDPOINT_TEXT)
+                .setLabel("Input Endpoint")
+                .wearableExtender {
+                    setEmojisAllowed(false)
+                    setInputActionType(EditorInfo.IME_ACTION_DONE)
+                }.build()
+        )
+
+        val intent: Intent = RemoteInputIntentHelper.createActionRemoteInputIntent()
+        RemoteInputIntentHelper.putRemoteInputsExtra(intent, remoteInputs)
+
+        onEndpointInputLauncher.launch(intent)
+    }
 
     HeartRateStreamerTheme {
         Column(
@@ -415,23 +444,21 @@ fun HeartRateScreen(
                         shape = RoundedCornerShape(12.dp)
                     )
                     .padding(horizontal = 6.dp, vertical = 2.dp),
-                contentAlignment = Alignment.CenterStart
+                contentAlignment = Alignment.CenterStart,
+
             ) {
-                BasicTextField(
-                    value = endpoint,
-                    onValueChange = onEndpointChanged,
-                    singleLine = true,
-                    textStyle = TextStyle(
-                        color = if (canStart) MaterialTheme.colors.onBackground else MaterialTheme.colors.onPrimary,
-                        fontSize = 10.sp
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        keyboardType = KeyboardType.Ascii,
-                        imeAction = ImeAction.Done,
-                    ),
+                TextButton (
                     enabled = canStart,
+                    onClick = onEndpointInputClick,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+
+                }
+                Text(
+                    text = endpoint,
+                    fontSize = 10.sp,
+                    color = if (canStart) MaterialTheme.colors.onBackground else MaterialTheme.colors.onPrimary,
                 )
             }
 
@@ -477,7 +504,7 @@ fun DefaultPreview() {
         126.0,
         HeartRateStatus.Init,
         ConnectionStatus.Idle,
-        "0.0.0.0:8000",
+        "http://192.168.8.2:9025/hr",
         { value -> },
         {},
         {}
