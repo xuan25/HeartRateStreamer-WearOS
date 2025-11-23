@@ -12,6 +12,7 @@ fun HeartRateStreamerTheme(
      * See: https://developer.android.com/jetpack/compose/designsystems/custom
      */
     MaterialTheme(
-        content = content
+        content = content,
+        colors = HeartRateStreamerColors,
     )
 }

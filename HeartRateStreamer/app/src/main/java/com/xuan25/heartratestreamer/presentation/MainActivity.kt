@@ -64,12 +64,14 @@ import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
 
 import androidx.wear.compose.material.Button
+import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.Icon
 import com.xuan25.heartratestreamer.ConnectionStatus
 import com.xuan25.heartratestreamer.HeartRatePermissionManager
 import com.xuan25.heartratestreamer.HeartRateSender
 import com.xuan25.heartratestreamer.HeartRateService
 import com.xuan25.heartratestreamer.HeartRateStatus
+import com.xuan25.heartratestreamer.presentation.theme.HeartRateStreamerTheme
 
 
 class MainActivity : ComponentActivity() {
@@ -305,7 +307,7 @@ fun HeartRateScreen(
     val canStop = isMeasuringPhase
     // -------------------------------------
 
-    MaterialTheme {
+    HeartRateStreamerTheme {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -390,7 +392,7 @@ fun HeartRateScreen(
 
             // Endpoint label
             Text(
-                text = "URL",
+                text = "Endpoint",
                 fontSize = 10.sp,
                 textAlign = TextAlign.Center,
                 color = if (canStart) MaterialTheme.colors.onBackground else MaterialTheme.colors.onPrimary,
@@ -405,7 +407,7 @@ fun HeartRateScreen(
                     .height(32.dp)
                     .border(
                         width = 1.dp,
-                        color = if (canStart) MaterialTheme.colors.onBackground else MaterialTheme.colors.onPrimary,
+                        color = if (canStart) MaterialTheme.colors.primary else MaterialTheme.colors.onPrimary,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(
@@ -423,7 +425,6 @@ fun HeartRateScreen(
                         color = if (canStart) MaterialTheme.colors.onBackground else MaterialTheme.colors.onPrimary,
                         fontSize = 10.sp
                     ),
-                    cursorBrush = SolidColor(MaterialTheme.colors.onBackground),
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.None,
@@ -443,22 +444,24 @@ fun HeartRateScreen(
             ) {
                 Button(
                     onClick = onStartClick,
-                    enabled = canStart
+                    enabled = canStart,
+                    colors = ButtonDefaults.outlinedButtonColors(),
+                    border = ButtonDefaults.outlinedButtonBorder(),
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.PlayArrow,
                         contentDescription = "Start streaming",
-                        tint = MaterialTheme.colors.onPrimary,
                     )
                 }
                 Button(
                     onClick = onStopClick,
-                    enabled = canStop
+                    enabled = canStop,
+                    colors = ButtonDefaults.outlinedButtonColors(),
+                    border = ButtonDefaults.outlinedButtonBorder(),
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Stop,
                         contentDescription = "Stop streaming",
-                        tint = MaterialTheme.colors.onPrimary,
                     )
                 }
             }
