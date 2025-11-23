@@ -1,6 +1,5 @@
 package com.xuan25.heartratestreamer
 
-import android.R
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -13,6 +12,8 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.wear.ongoing.OngoingActivity
 import com.xuan25.heartratestreamer.presentation.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -94,6 +95,7 @@ class HeartRateService : Service() {
                 Log.d(TAG, "ACTION_START")
 
                 val notification = buildNotification("Heart rate streaming service running")
+
                 startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_HEALTH)
 
                 // Start measuring from the service
@@ -152,17 +154,32 @@ class HeartRateService : Service() {
         )
 
         val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Notification.Builder(this, CHANNEL_ID)
+            NotificationCompat.Builder(this, CHANNEL_ID)
         } else {
-            Notification.Builder(this)
+            NotificationCompat.Builder(this)
         }
 
-        return builder
-            .setContentTitle("Heart rate")
+        val notificationBuilder = builder
+            .setContentTitle("Heart rate streaming")
             .setContentText(content)
-            .setSmallIcon(android.R.drawable.ic_media_play)
-            .setOngoing(true)
+            .setSmallIcon(R.drawable.ic_heart_rate_streamer_foreground)
+            .setCategory(NotificationCompat.CATEGORY_WORKOUT)
             .setContentIntent(pendingIntent)
-            .build()
+            .setOngoing(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+
+        val ongoingActivity =
+            OngoingActivity.Builder(applicationContext, NOTIFICATION_ID, notificationBuilder)
+                // Sets the icon that appears on the watch face in active mode.
+                .setAnimatedIcon(R.drawable.animated_heart_rate_streamer_foreground)
+                // Sets the icon that appears on the watch face in ambient mode.
+                .setStaticIcon(R.drawable.ic_heart_rate_streamer_foreground)
+                // Sets the tap target to bring the user back to the app.
+                .setTouchIntent(pendingIntent)
+                .build()
+
+        ongoingActivity.apply(applicationContext)
+
+        return notificationBuilder.build()
     }
 }
