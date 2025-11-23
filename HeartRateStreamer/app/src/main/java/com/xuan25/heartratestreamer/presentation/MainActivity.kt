@@ -5,13 +5,10 @@
 
 package com.xuan25.heartratestreamer.presentation
 
-import android.Manifest
 import android.app.RemoteInput
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.inputmethod.EditorInfo
@@ -56,7 +53,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
@@ -150,26 +146,8 @@ class MainActivity : ComponentActivity() {
         prefs.edit().putString(KEY_ENDPOINT, url).apply()
     }
 
-    private fun ensureNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= 33) {
-            val granted = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-
-            if (!granted) {
-                requestPermissions(
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    200  // different request code from your HR permissions
-                )
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        ensureNotificationPermission()
 
         endpointState = loadSavedEndpoint()
         HeartRateSender.setEndpoint(endpointState)
@@ -216,20 +194,6 @@ class MainActivity : ComponentActivity() {
     private fun onStopClicked() {
         HeartRateService.stop(this)       // ask service to stop
         connectionStatusState = ConnectionStatus.Idle
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        permissionManager.handleRequestPermissionsResult(
-            requestCode,
-            permissions,
-            grantResults
-        )
     }
 }
 
@@ -505,7 +469,7 @@ fun DefaultPreview() {
         HeartRateStatus.Init,
         ConnectionStatus.Idle,
         "http://192.168.8.2:9025/hr",
-        { value -> },
+        { _ -> },
         {},
         {}
     )

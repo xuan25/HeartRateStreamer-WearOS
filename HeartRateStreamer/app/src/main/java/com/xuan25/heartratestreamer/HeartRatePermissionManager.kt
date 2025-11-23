@@ -5,6 +5,8 @@ import android.content.pm.PackageManager
 import android.health.connect.HealthPermissions
 import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 
 class HeartRatePermissionManager(
     private val activity: ComponentActivity,
@@ -13,12 +15,18 @@ class HeartRatePermissionManager(
 
     private var onAllGranted: (() -> Unit)? = null
 
-    companion object {
-        const val REQUEST_CODE = 100
-    }
+    private var requestPermissionsLauncher: ActivityResultLauncher<Array<String>> =
+        activity.registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { result ->
+            handleRequestPermissionsResult(result)
+        }
 
-    private fun currentHeartRatePermissions(): Array<String> {
+    private fun getRequiredPermissions(): Array<String> {
         val list = mutableListOf<String>()
+
+        // notification
+        list += Manifest.permission.POST_NOTIFICATIONS
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
             // New granular health permissions
@@ -42,13 +50,13 @@ class HeartRatePermissionManager(
     }
 
     fun ensurePermissions() {
-        val required = currentHeartRatePermissions()
+        val required = getRequiredPermissions()
         val missing = required.filter {
             activity.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
         }
 
         if (missing.isNotEmpty()) {
-            activity.requestPermissions(missing.toTypedArray(), REQUEST_CODE)
+            requestPermissionsLauncher.launch(missing.toTypedArray())
             onStatus(HeartRateStatus.RequestingPermissions)
         } else {
             onStatus(HeartRateStatus.PermissionsGranted)
@@ -58,15 +66,10 @@ class HeartRatePermissionManager(
         }
     }
 
-    fun handleRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode != REQUEST_CODE) return
+    fun handleRequestPermissionsResult(result: Map<String, @JvmSuppressWildcards Boolean>) {
 
         // Did the user grant at least one permission in this dialog?
-        val anyGranted = grantResults.any { it == PackageManager.PERMISSION_GRANTED }
+        val anyGranted = result.values.any { it }
         if (!anyGranted) {
             onStatus(HeartRateStatus.PermissionDenied)
             onAllGranted = null
@@ -78,4 +81,5 @@ class HeartRatePermissionManager(
         // - otherwise it will call onAllGranted()
         ensurePermissions()
     }
+
 }
