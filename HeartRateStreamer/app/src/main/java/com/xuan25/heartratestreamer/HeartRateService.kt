@@ -94,7 +94,7 @@ class HeartRateService : Service() {
             ACTION_START -> {
                 Log.d(TAG, "ACTION_START")
 
-                val notification = buildNotification("Heart rate streaming service running")
+                val notification = buildNotification()
 
                 startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_HEALTH)
 
@@ -106,7 +106,7 @@ class HeartRateService : Service() {
 
                 heartRateMeasuring.stop()
 
-                stopForeground(true)
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
             else -> {
@@ -139,7 +139,7 @@ class HeartRateService : Service() {
         }
     }
 
-    private fun buildNotification(content: String): Notification {
+    private fun buildNotification(): Notification {
         // Intent to open MainActivity when notification is tapped
         val tapIntent = Intent(this, MainActivity::class.java).apply {
             // Make sure it reuses existing activity instead of creating a stack of them
@@ -153,15 +153,11 @@ class HeartRateService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationCompat.Builder(this, CHANNEL_ID)
-        } else {
-            NotificationCompat.Builder(this)
-        }
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
 
         val notificationBuilder = builder
             .setContentTitle("Heart rate streaming")
-            .setContentText(content)
+            .setContentText("Heart rate streaming service is running")
             .setSmallIcon(R.drawable.ic_heart_rate_streamer_foreground)
             .setCategory(NotificationCompat.CATEGORY_WORKOUT)
             .setContentIntent(pendingIntent)

@@ -65,10 +65,7 @@ class HeartRateMeasuring(
     }
     private val exerciseCallback = object : ExerciseUpdateCallback {
         override fun onExerciseUpdateReceived(update: ExerciseUpdate) {
-            val exerciseStateInfo = update.exerciseStateInfo
-            val activeDuration = update.activeDurationCheckpoint
             val latestMetrics = update.latestMetrics
-            val latestGoals = update.latestAchievedGoals
 
             val hrPoints = latestMetrics.getData(DataType.HEART_RATE_BPM)
             for (point in hrPoints.reversed()) {
@@ -204,7 +201,7 @@ class HeartRateMeasuring(
                             measureCallback
                         )
                         onStatus(HeartRateStatus.Stopped)
-                    } catch (e: CancellationException) {
+                    } catch (_: CancellationException) {
                         // Scope was cancelled – ignore, we're shutting down anyway
                         Log.d("HeartRateMeasuring", "Scope cancelled during unregister, ignoring")
                         onStatus(HeartRateStatus.Stopped)
@@ -219,7 +216,7 @@ class HeartRateMeasuring(
                     try {
                         exerciseClient.endExercise()
                         onStatus(HeartRateStatus.Stopped)
-                    } catch (e: CancellationException) {
+                    } catch (_: CancellationException) {
                         Log.d(tag, "Scope cancelled during stopExercise, ignoring")
                         onStatus(HeartRateStatus.Stopped)
                     } catch (e: Exception) {

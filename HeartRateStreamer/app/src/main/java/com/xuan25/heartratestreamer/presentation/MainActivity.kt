@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
                     statusState = status
 
                     if (statusState == HeartRateStatus.Stopped) {
-                        heartRateState = null;
+                        heartRateState = null
                     }
                 }
             }
@@ -270,7 +270,7 @@ fun HeartRateScreen(
     }
 
     val canStart = !isMeasuringPhase && !isBusyPermissionsOrCheck
-    val canStop = isMeasuringPhase
+    @Suppress("UnnecessaryVariable", "RedundantSuppression") val canStop = isMeasuringPhase
     // -------------------------------------
 
 

@@ -60,8 +60,8 @@ class HeartRatePermissionManager(
             onStatus(HeartRateStatus.RequestingPermissions)
         } else {
             onStatus(HeartRateStatus.PermissionsGranted)
-            val callback = onAllGranted;
-            onAllGranted = null;
+            val callback = onAllGranted
+            onAllGranted = null
             callback?.invoke()
         }
     }

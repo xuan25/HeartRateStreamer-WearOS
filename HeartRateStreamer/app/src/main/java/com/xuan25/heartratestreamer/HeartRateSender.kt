@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
 import java.net.URL
@@ -18,7 +17,7 @@ object HeartRateSender {
     // Coroutine scope for background network work
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private var lastJob: Job? = null;
+    private var lastJob: Job? = null
 
     // Endpoint the user can change
     @Volatile
@@ -81,7 +80,7 @@ object HeartRateSender {
                     Log.w(TAG, "Non-success HTTP code: $code")
                     statusListener?.invoke(ConnectionStatus.Error)
                 }
-            } catch (e: CancellationException) {
+            } catch (_: CancellationException) {
                 Log.d(TAG, "Sent HR Canceled")
                 statusListener?.invoke(ConnectionStatus.Idle)
             }
@@ -94,9 +93,9 @@ object HeartRateSender {
         }
     }
 
-    fun reset() {
-        lastJob?.cancel()
-        lastSentAt = 0L
-        statusListener?.invoke(ConnectionStatus.Idle)
-    }
+//    fun reset() {
+//        lastJob?.cancel()
+//        lastSentAt = 0L
+//        statusListener?.invoke(ConnectionStatus.Idle)
+//    }
 }
