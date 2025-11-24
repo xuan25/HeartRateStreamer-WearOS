@@ -68,6 +68,7 @@ import com.xuan25.heartratestreamer.HeartRateSender
 import com.xuan25.heartratestreamer.HeartRateService
 import com.xuan25.heartratestreamer.HeartRateStatus
 import com.xuan25.heartratestreamer.presentation.theme.HeartRateStreamerTheme
+import androidx.core.content.edit
 
 
 class MainActivity : ComponentActivity() {
@@ -143,7 +144,7 @@ class MainActivity : ComponentActivity() {
 
     private fun saveEndpoint(url: String) {
         val prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-        prefs.edit().putString(KEY_ENDPOINT, url).apply()
+        prefs.edit { putString(KEY_ENDPOINT, url) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
