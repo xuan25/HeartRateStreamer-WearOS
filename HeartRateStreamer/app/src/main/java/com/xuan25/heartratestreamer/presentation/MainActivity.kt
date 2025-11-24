@@ -171,7 +171,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // 3) Simple UI for now
         setContent {
             HeartRateScreen(
                 heartRate = heartRateState,

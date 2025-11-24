@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">HeartRateStreamer</string>
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
+
     <string name="status_init">Init</string>
     <string name="status_checking_capabilities">Check</string>
     <string name="status_not_supported">No sensor</string>
