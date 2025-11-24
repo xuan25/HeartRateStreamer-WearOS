@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -95,8 +94,13 @@ class HeartRateService : Service() {
                 Log.d(TAG, "ACTION_START")
 
                 val notification = buildNotification()
-
-                startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_HEALTH)
+                
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    // On Android 14+ we need to specify the type of foreground service
+                    startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_HEALTH)
+                } else {
+                    startForeground(NOTIFICATION_ID, notification)
+                }
 
                 // Start measuring from the service
                 heartRateMeasuring.start()
@@ -128,22 +132,20 @@ class HeartRateService : Service() {
     override fun onBind(intent: Intent?): IBinder = binder
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val mgr = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Heart rate streaming",
-                NotificationManager.IMPORTANCE_LOW,
-            )
-            mgr.createNotificationChannel(channel)
-        }
+        val mgr = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Heart rate streaming",
+            NotificationManager.IMPORTANCE_LOW,
+        )
+        mgr.createNotificationChannel(channel)
     }
 
     private fun buildNotification(): Notification {
         // Intent to open MainActivity when notification is tapped
         val tapIntent = Intent(this, MainActivity::class.java).apply {
-            // Make sure it reuses existing activity instead of creating a stack of them
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            // Reuse existing activity if it's already at the top
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
         val pendingIntent = PendingIntent.getActivity(

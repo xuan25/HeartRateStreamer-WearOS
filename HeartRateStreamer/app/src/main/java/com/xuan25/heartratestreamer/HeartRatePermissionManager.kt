@@ -25,8 +25,14 @@ class HeartRatePermissionManager(
     private fun getRequiredPermissions(): Array<String> {
         val list = mutableListOf<String>()
 
-        // notification
-        list += Manifest.permission.POST_NOTIFICATIONS
+        // Notification
+        // Apps don't need to request the POST_NOTIFICATIONS permission in order to launch a
+        // foreground service.
+        // However, apps must include a notification when they start a foreground service,
+        // just as they do on previous versions of Android.
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+             list += Manifest.permission.POST_NOTIFICATIONS
+         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
             // New granular health permissions
@@ -35,11 +41,10 @@ class HeartRatePermissionManager(
         } else {
             // Legacy body sensor permissions
             list += Manifest.permission.BODY_SENSORS
-            list += Manifest.permission.BODY_SENSORS_BACKGROUND
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                list += Manifest.permission.BODY_SENSORS_BACKGROUND
+            }
         }
-
-        // For exercise sessions
-        list += Manifest.permission.ACTIVITY_RECOGNITION
 
         return list.toTypedArray()
     }
