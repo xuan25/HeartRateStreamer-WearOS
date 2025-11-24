@@ -317,7 +317,7 @@ fun HeartRateScreen(
 
             // Heart rate
             Text(
-                text = heartRate?.let { "${it.toInt()} ${stringResource(R.string.unit_heart_rate)}" } ?: "${stringResource(R.string.placeholder_heart_rate)} ${stringResource(R.string.unit_heart_rate)}",
+                text = heartRate?.let { "${it.toInt()}${stringResource(R.string.unit_heart_rate)}" } ?: "${stringResource(R.string.placeholder_heart_rate)}${stringResource(R.string.unit_heart_rate)}",
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center
             )

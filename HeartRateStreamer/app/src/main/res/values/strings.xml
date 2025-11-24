@@ -28,7 +28,7 @@
     <string name="desc_start_streaming">Start Streaming</string>
     <string name="desc_stop_streaming">Stop Streaming</string>
 
-    <string name="unit_heart_rate">bpm</string>
+    <string name="unit_heart_rate"></string>
     <string name="placeholder_heart_rate">---</string>
 
 </resources>

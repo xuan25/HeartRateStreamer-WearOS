@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">心率串流</string>
+
+    <string name="status_init">初始化</string>
+    <string name="status_checking_capabilities">检查</string>
+    <string name="status_not_supported">无传感器</string>
+    <string name="status_sensor_supported">就绪</string>
+    <string name="status_requesting_permissions">权限？</string>
+    <string name="status_permission_denied">无权限</string>
+    <string name="status_permission_granted">就绪</string>
+    <string name="status_starting">开始</string>
+    <string name="status_waiting_for_data">等待</string>
+    <string name="status_streaming">在线</string>
+    <string name="status_stopping">停止…</string>
+    <string name="status_stopped">就绪</string>
+
+    <string name="status_idle">空闲</string>
+    <string name="status_sending">发送</string>
+    <string name="status_ok">OK</string>
+
+    <string name="status_error">错误</string>
+
+    <string name="label_endpoint">服务接入点</string>
+    <string name="label_input_endpoint">输入接入点 URL</string>
+
+    <string name="desc_status">状态</string>
+    <string name="desc_connection">链接</string>
+    <string name="desc_start_streaming">开始串流</string>
+    <string name="desc_stop_streaming">停止串流</string>
+
+    <string name="unit_heart_rate"></string>
+    <string name="placeholder_heart_rate">---</string>
+
+</resources>
