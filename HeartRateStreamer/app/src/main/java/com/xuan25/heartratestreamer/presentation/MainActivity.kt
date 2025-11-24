@@ -7,6 +7,7 @@ package com.xuan25.heartratestreamer.presentation
 
 import android.app.RemoteInput
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
@@ -48,6 +49,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,6 +72,7 @@ import com.xuan25.heartratestreamer.HeartRateService
 import com.xuan25.heartratestreamer.HeartRateStatus
 import com.xuan25.heartratestreamer.presentation.theme.HeartRateStreamerTheme
 import androidx.core.content.edit
+import com.xuan25.heartratestreamer.R
 
 
 class MainActivity : ComponentActivity() {
@@ -198,7 +202,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private const val KEY_ENDPOINT_TEXT: String = "endpoint"
+private const val KEY_ENDPOINT_INPUT: String = "endpoint_input"
 
 @Composable
 fun HeartRateScreen(
@@ -212,20 +216,20 @@ fun HeartRateScreen(
 ) {
     // --- status text ---
     val statusText = when (status) {
-        HeartRateStatus.Init -> "Init"
-        HeartRateStatus.CheckingCapabilities -> "Check"
-        HeartRateStatus.SensorNotSupported -> "No sensor"
-        HeartRateStatus.SensorSupported -> "OK"
-        HeartRateStatus.RequestingPermissions -> "Perm?"
-        HeartRateStatus.PermissionDenied -> "No perm"
-        HeartRateStatus.PermissionsGranted -> "Ready"
-        HeartRateStatus.Starting -> "Start"
-        HeartRateStatus.WaitingForData -> "Wait"
-        HeartRateStatus.Streaming -> "Live"
-        HeartRateStatus.Stopping -> "Stop..."
-        HeartRateStatus.Stopped -> "Stopped"
+        HeartRateStatus.Init -> stringResource(R.string.status_init)
+        HeartRateStatus.CheckingCapabilities -> stringResource(R.string.status_checking_capabilities)
+        HeartRateStatus.SensorNotSupported -> stringResource(R.string.status_not_supported)
+        HeartRateStatus.SensorSupported -> stringResource(R.string.status_sensor_supported)
+        HeartRateStatus.RequestingPermissions -> stringResource(R.string.status_requesting_permissions)
+        HeartRateStatus.PermissionDenied -> stringResource(R.string.status_permission_denied)
+        HeartRateStatus.PermissionsGranted -> stringResource(R.string.status_permission_granted)
+        HeartRateStatus.Starting -> stringResource(R.string.status_starting)
+        HeartRateStatus.WaitingForData -> stringResource(R.string.status_waiting_for_data)
+        HeartRateStatus.Streaming -> stringResource(R.string.status_streaming)
+        HeartRateStatus.Stopping -> stringResource(R.string.status_stopping)
+        HeartRateStatus.Stopped -> stringResource(R.string.status_stopped)
 
-        HeartRateStatus.Error -> "Error"
+        HeartRateStatus.Error -> stringResource(R.string.status_error)
     }
 
     // --- status icon (single-color) ---
@@ -249,10 +253,10 @@ fun HeartRateScreen(
     }
 
     val connectionText = when (connectionStatus) {
-        ConnectionStatus.Idle -> "Idle"
-        ConnectionStatus.Sending -> "Send"
-        ConnectionStatus.Error -> "Err"
-        ConnectionStatus.Ok -> "OK"
+        ConnectionStatus.Idle -> stringResource(R.string.status_idle)
+        ConnectionStatus.Sending -> stringResource(R.string.status_sending)
+        ConnectionStatus.Error -> stringResource(R.string.status_error)
+        ConnectionStatus.Ok -> stringResource(R.string.status_ok)
     }
 
     // --- Logic for conditional buttons ---
@@ -280,15 +284,15 @@ fun HeartRateScreen(
     val onEndpointInputLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         it.data?.let { data ->
             val results: Bundle = RemoteInput.getResultsFromIntent(data)
-            val endpoint: CharSequence? = results.getCharSequence(KEY_ENDPOINT_TEXT)
+            val endpoint: CharSequence? = results.getCharSequence(KEY_ENDPOINT_INPUT)
             onEndpointChanged(endpoint.toString())
         }
     }
 
-    val onEndpointInputClick = {
+    val onEndpointInputClick = { context: Context ->
         val remoteInputs: List<RemoteInput> = listOf(
-            RemoteInput.Builder(KEY_ENDPOINT_TEXT)
-                .setLabel("Input Endpoint")
+            RemoteInput.Builder(KEY_ENDPOINT_INPUT)
+                .setLabel(context.resources.getString(R.string.label_input_endpoint))
                 .wearableExtender {
                     setEmojisAllowed(false)
                     setInputActionType(EditorInfo.IME_ACTION_DONE)
@@ -314,7 +318,7 @@ fun HeartRateScreen(
 
             // Heart rate
             Text(
-                text = heartRate?.let { "${it.toInt()} bpm" } ?: "-- bpm",
+                text = heartRate?.let { "${it.toInt()} ${stringResource(R.string.unit_heart_rate)}" } ?: "${stringResource(R.string.placeholder_heart_rate)} ${stringResource(R.string.unit_heart_rate)}",
                 fontSize = 20.sp,
                 textAlign = TextAlign.Center
             )
@@ -336,7 +340,7 @@ fun HeartRateScreen(
                 ) {
                     Icon(
                         imageVector = statusIcon,
-                        contentDescription = "Status",
+                        contentDescription = stringResource(R.string.desc_status),
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .size(14.dp)
@@ -364,7 +368,7 @@ fun HeartRateScreen(
                 ) {
                     Icon(
                         imageVector = connectionIcon,
-                        contentDescription = "Connection",
+                        contentDescription = stringResource(R.string.desc_connection),
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .size(14.dp)
@@ -386,7 +390,7 @@ fun HeartRateScreen(
 
             // Endpoint label
             Text(
-                text = "Endpoint",
+                text = stringResource(R.string.label_endpoint),
                 fontSize = 10.sp,
                 textAlign = TextAlign.Center,
                 color = if (canStart) MaterialTheme.colors.onBackground else MaterialTheme.colors.onPrimary,
@@ -412,9 +416,10 @@ fun HeartRateScreen(
                 contentAlignment = Alignment.CenterStart,
 
             ) {
+                val localContext = LocalContext.current
                 TextButton (
                     enabled = canStart,
-                    onClick = onEndpointInputClick,
+                    onClick = { onEndpointInputClick(localContext) },
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
@@ -442,7 +447,7 @@ fun HeartRateScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.PlayArrow,
-                        contentDescription = "Start streaming",
+                        contentDescription = stringResource(R.string.desc_start_streaming),
                     )
                 }
                 Button(
@@ -453,7 +458,7 @@ fun HeartRateScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Stop,
-                        contentDescription = "Stop streaming",
+                        contentDescription = stringResource(R.string.desc_stop_streaming),
                     )
                 }
             }

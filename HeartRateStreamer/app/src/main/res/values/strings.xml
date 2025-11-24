@@ -4,5 +4,34 @@
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
     -->
-    <string name="hello_world">From the Square world,\nHello, %1$s!</string>
+    <string name="status_init">Init</string>
+    <string name="status_checking_capabilities">Check</string>
+    <string name="status_not_supported">No sensor</string>
+    <string name="status_sensor_supported">Ready</string>
+    <string name="status_requesting_permissions">Perm?</string>
+    <string name="status_permission_denied">No perm</string>
+    <string name="status_permission_granted">Ready</string>
+    <string name="status_starting">Start</string>
+    <string name="status_waiting_for_data">Wait</string>
+    <string name="status_streaming">Live</string>
+    <string name="status_stopping">Stop…</string>
+    <string name="status_stopped">Ready</string>
+
+    <string name="status_idle">Idle</string>
+    <string name="status_sending">Send</string>
+    <string name="status_ok">OK</string>
+
+    <string name="status_error">Error</string>
+
+    <string name="label_endpoint">Endpoint</string>
+    <string name="label_input_endpoint">Enter endpoint URL</string>
+
+    <string name="desc_status">Status</string>
+    <string name="desc_connection">Connection</string>
+    <string name="desc_start_streaming">Start Streaming</string>
+    <string name="desc_stop_streaming">Stop Streaming</string>
+
+    <string name="unit_heart_rate">bpm</string>
+    <string name="placeholder_heart_rate">---</string>
+
 </resources>
