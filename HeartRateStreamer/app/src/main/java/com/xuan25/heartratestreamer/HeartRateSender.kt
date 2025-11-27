@@ -46,10 +46,7 @@ object HeartRateSender {
         }
         lastSentAt = now
 
-        val json = """{
-            "heart_rate": $bpm,
-            "timestamp": $now
-        }""".trimIndent()
+        val json = """{"hr": $bpm,"ts": $now}"""
 
         // Notify we're sending
         statusListener?.invoke(ConnectionStatus.Sending)

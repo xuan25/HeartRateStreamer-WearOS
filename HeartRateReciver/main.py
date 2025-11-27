@@ -130,7 +130,7 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
 
-            logging.info(payload)
+            logging.info("Received payload: %s", payload)
 
             # set heart rate
 
